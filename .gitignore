@@ -1,0 +1,66 @@
+# Build outputs
+target/
+build/
+out/
+bin/
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Environment variables
+.env
+*.env
+.env.local
+.env.production
+
+# IDE files
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### VS Code ###
+.vscode/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Logs
+*.log
+logs/
+
+# Docker
+docker-compose.override.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Help files
+**/HELP.md
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
