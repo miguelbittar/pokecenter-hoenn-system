@@ -14,7 +14,7 @@ public class BusinessIdGenerator {
     }
 
     public String generateSequentialNurseJoyId() {
-        String lastNurseJoyId = nurseJoyRepository.findTopByOrderByCreatedAtDesc()
+        String lastNurseJoyId = nurseJoyRepository.findTopByIsDeletedFalseOrderByCreatedAtDesc()
                 .map(NurseJoy::getNurseJoyId)
                 .orElse("JOY000000");
         int nextNumber = Integer.parseInt(lastNurseJoyId.substring(3)) + 1;

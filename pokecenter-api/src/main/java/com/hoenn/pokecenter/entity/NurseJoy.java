@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -52,6 +53,12 @@ public class NurseJoy {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     public NurseJoy() {}
 
     public NurseJoy(String name, String email, String city, String region, NurseJoyRole role) {
@@ -70,6 +77,18 @@ public class NurseJoy {
         this.city = city;
         this.region = region;
         this.role = role;
+    }
+
+    public void softDelete(){
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void restore(){
+        this.isDeleted = false;
+        this.deletedAt = null;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public String getId() {
@@ -150,5 +169,21 @@ public class NurseJoy {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

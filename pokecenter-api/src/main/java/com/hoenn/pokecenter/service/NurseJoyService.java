@@ -29,7 +29,7 @@ public class NurseJoyService {
 
     public NurseJoy registerNurseJoy(NurseJoy nurseJoy){
 
-        if (nurseJoyRepository.findByEmail(nurseJoy.getEmail()).isPresent()) {
+        if (nurseJoyRepository.findByEmailAndIsDeletedFalse(nurseJoy.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
 
@@ -39,11 +39,11 @@ public class NurseJoyService {
     }
 
     public List<NurseJoy> getAllNurseJoys(){
-        return nurseJoyRepository.findAll();
+        return nurseJoyRepository.findByIsDeletedFalse();
     }
 
     public NurseJoy findByNurseJoyId(String nurseJoyId){
-        return nurseJoyRepository.findByNurseJoyId(nurseJoyId)
+        return nurseJoyRepository.findByNurseJoyIdAndIsDeletedFalse(nurseJoyId)
                 .orElseThrow(() -> new NurseJoyNotFoundException("No Nurse Joy found with ID: " + nurseJoyId));
     }
 
@@ -90,11 +90,12 @@ public class NurseJoyService {
     @Transactional
     public void deleteByNurseJoyId(String nurseJoyId){
         NurseJoy existingJoy = findByNurseJoyId(nurseJoyId);
-        nurseJoyRepository.deleteByNurseJoyId(nurseJoyId);
+        existingJoy.softDelete();
+        nurseJoyRepository.save(existingJoy);
     }
 
     private void checkEmailExists(String email, String nurseJoyId) {
-        Optional<NurseJoy> existingJoy = nurseJoyRepository.findByEmail(email);
+        Optional<NurseJoy> existingJoy = nurseJoyRepository.findByEmailAndIsDeletedFalse(email);
         if (existingJoy.isPresent() && !existingJoy.get().getNurseJoyId().equals(nurseJoyId)) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
