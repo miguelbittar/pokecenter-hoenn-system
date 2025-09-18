@@ -1,5 +1,6 @@
 package com.hoenn.pokecenter.mapper;
 
+import com.hoenn.pokecenter.dto.request.NurseJoyProfileUpdateByAdminRequest;
 import com.hoenn.pokecenter.dto.request.NurseJoyProfileUpdateRequest;
 import com.hoenn.pokecenter.dto.request.NurseJoyRequest;
 import com.hoenn.pokecenter.dto.response.NurseJoyResponse;
@@ -19,6 +20,17 @@ public final class NurseJoyMapper {
         );
     }
     public static NurseJoy toEntityForUpdate(NurseJoyProfileUpdateRequest request){
+        return new NurseJoy(
+                request.name(),
+                request.email(),
+                request.password(),
+                request.city(),
+                request.region(),
+                request.role()
+        );
+    }
+
+    public static NurseJoy toEntityForAdminUpdate(NurseJoyProfileUpdateByAdminRequest request){
         return new NurseJoy(
                 request.name(),
                 request.email(),

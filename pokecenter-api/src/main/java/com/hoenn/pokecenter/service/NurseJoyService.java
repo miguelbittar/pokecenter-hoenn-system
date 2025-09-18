@@ -38,6 +38,23 @@ public class NurseJoyService {
                 .orElseThrow(() -> new RuntimeException("No Nurse Joy found with ID: " + nurseJoyId));
     }
 
+    public NurseJoy updateNurseJoyProfileByAdmin(String nurseJoyId, NurseJoy updateProfile){
+        NurseJoy existingJoy = nurseJoyRepository.findByNurseJoyId(nurseJoyId)
+                .orElseThrow(() -> new RuntimeException("No Nurse Joy found with ID: " + nurseJoyId));
+
+        if (updateProfile.getPassword() != null){
+            throw new ValidationException("Password updates not allowed through admin endpoint.");
+        }
+
+        Optional.ofNullable(updateProfile.getName()).ifPresent(existingJoy::setName);
+        Optional.ofNullable(updateProfile.getEmail()).ifPresent(existingJoy::setEmail);
+        Optional.ofNullable(updateProfile.getCity()).ifPresent(existingJoy::setCity);
+        Optional.ofNullable(updateProfile.getRegion()).ifPresent(existingJoy::setRegion);
+        Optional.ofNullable(updateProfile.getRole()).ifPresent(existingJoy::setRole);
+
+        return nurseJoyRepository.save(existingJoy);
+    }
+
     public NurseJoy updateOwnProfile(String nurseJoyId, NurseJoy updateProfile){
         NurseJoy existingJoy = nurseJoyRepository.findByNurseJoyId(nurseJoyId)
                 .orElseThrow(() -> new RuntimeException("No Nurse Joy found with ID: " + nurseJoyId));
