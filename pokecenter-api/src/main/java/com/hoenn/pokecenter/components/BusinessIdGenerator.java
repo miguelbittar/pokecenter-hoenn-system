@@ -1,4 +1,4 @@
-package com.hoenn.pokecenter.utils;
+package com.hoenn.pokecenter.components;
 
 import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.repository.NurseJoyRepository;
