@@ -36,4 +36,10 @@ public class NurseJoyController {
                 .map(NurseJoyMapper::toResponse)
                 .toList());
     }
+
+    @GetMapping("/{nurseJoyId}")
+    public ResponseEntity<NurseJoyResponse> getNurseJoyByNurseJoyId(@PathVariable String nurseJoyId) {
+        NurseJoy nurseJoy = nurseJoyService.findByNurseJoyId(nurseJoyId);
+        return ResponseEntity.ok(NurseJoyMapper.toResponse(nurseJoy));
+    }
 }

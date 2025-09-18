@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface NurseJoyRepository extends JpaRepository<NurseJoy, String> {
     Optional<NurseJoy> findTopByOrderByCreatedAtDesc();
+    Optional<NurseJoy> findByNurseJoyId(String nurseJoyId);
 }

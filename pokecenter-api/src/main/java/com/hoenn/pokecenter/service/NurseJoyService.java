@@ -7,6 +7,7 @@ import com.hoenn.pokecenter.components.PasswordGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NurseJoyService {
@@ -29,5 +30,10 @@ public class NurseJoyService {
 
     public List<NurseJoy> getAllNurseJoys(){
         return nurseJoyRepository.findAll();
+    }
+
+    public NurseJoy findByNurseJoyId(String nurseJoyId){
+        return nurseJoyRepository.findByNurseJoyId(nurseJoyId)
+                .orElseThrow(() -> new RuntimeException("No Nurse Joy found with ID: " + nurseJoyId));
     }
 }
