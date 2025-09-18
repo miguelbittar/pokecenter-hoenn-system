@@ -18,6 +18,8 @@ public class NurseJoyService {
 
     public NurseJoy registerNurseJoy(NurseJoy nurseJoy){
         nurseJoy.setNurseJoyId(businessIdGenerator.generateSequentialNurseJoyId());
+        //TODO: PASSWORD GENERATOR
+        nurseJoy.setPassword("12345678"); // only for test...
         return nurseJoyRepository.save(nurseJoy);
     }
 }

@@ -54,6 +54,14 @@ public class NurseJoy {
 
     public NurseJoy() {}
 
+    public NurseJoy(String name, String email, String city, String region, NurseJoyRole role) {
+        this.name = name;
+        this.email = email;
+        this.city = city;
+        this.region = region;
+        this.role = role;
+    }
+
     public NurseJoy(String name, String email, String password,
                     String city, String region, NurseJoyRole role) {
         this.name = name;
