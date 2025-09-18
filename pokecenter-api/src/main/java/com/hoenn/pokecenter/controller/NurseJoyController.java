@@ -1,5 +1,6 @@
 package com.hoenn.pokecenter.controller;
 
+import com.hoenn.pokecenter.dto.request.NurseJoyProfileUpdateRequest;
 import com.hoenn.pokecenter.dto.request.NurseJoyRequest;
 import com.hoenn.pokecenter.dto.response.NurseJoyResponse;
 import com.hoenn.pokecenter.entity.NurseJoy;
@@ -41,5 +42,12 @@ public class NurseJoyController {
     public ResponseEntity<NurseJoyResponse> getNurseJoyByNurseJoyId(@PathVariable String nurseJoyId) {
         NurseJoy nurseJoy = nurseJoyService.findByNurseJoyId(nurseJoyId);
         return ResponseEntity.ok(NurseJoyMapper.toResponse(nurseJoy));
+    }
+
+    @PutMapping("/{nurseJoyId}/profile")
+    public ResponseEntity<NurseJoyResponse> updateOwnProfile(
+            @PathVariable String nurseJoyId, @Valid @RequestBody NurseJoyProfileUpdateRequest request){
+        NurseJoy updateNurseJoy = nurseJoyService.updateOwnProfile(nurseJoyId, NurseJoyMapper.toEntityForUpdate(request));
+        return ResponseEntity.ok(NurseJoyMapper.toResponse(updateNurseJoy));
     }
 }
