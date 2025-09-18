@@ -1,6 +1,7 @@
 package com.hoenn.pokecenter.service;
 
 import com.hoenn.pokecenter.entity.NurseJoy;
+import com.hoenn.pokecenter.exception.custom.EmailAlreadyExistsException;
 import com.hoenn.pokecenter.exception.custom.NurseJoyNotFoundException;
 import com.hoenn.pokecenter.exception.custom.PasswordChangeNotAllowedException;
 import com.hoenn.pokecenter.exception.custom.UnauthorizedRoleChangeException;
@@ -8,7 +9,6 @@ import com.hoenn.pokecenter.repository.NurseJoyRepository;
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
 import com.hoenn.pokecenter.components.PasswordGenerator;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +28,11 @@ public class NurseJoyService {
     }
 
     public NurseJoy registerNurseJoy(NurseJoy nurseJoy){
+
+        if (nurseJoyRepository.findByEmail(nurseJoy.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already in use");
+        }
+
         nurseJoy.setNurseJoyId(businessIdGenerator.generateSequentialNurseJoyId());
         nurseJoy.setPassword(passwordGenerator.generateTemporaryPassword());
         return nurseJoyRepository.save(nurseJoy);
@@ -49,6 +54,10 @@ public class NurseJoyService {
             throw new PasswordChangeNotAllowedException("Password updates not allowed through admin endpoint");
         }
 
+        if (updateProfile.getEmail() != null) {
+            checkEmailExists(updateProfile.getEmail(), nurseJoyId);
+        }
+
         Optional.ofNullable(updateProfile.getName()).ifPresent(existingJoy::setName);
         Optional.ofNullable(updateProfile.getEmail()).ifPresent(existingJoy::setEmail);
         Optional.ofNullable(updateProfile.getCity()).ifPresent(existingJoy::setCity);
@@ -65,6 +74,10 @@ public class NurseJoyService {
             throw new UnauthorizedRoleChangeException("Role updates not allowed through common endpoint");
         }
 
+        if (updateProfile.getEmail() != null) {
+            checkEmailExists(updateProfile.getEmail(), nurseJoyId);
+        }
+
         Optional.ofNullable(updateProfile.getName()).ifPresent(existingJoy::setName);
         Optional.ofNullable(updateProfile.getEmail()).ifPresent(existingJoy::setEmail);
         Optional.ofNullable(updateProfile.getPassword()).ifPresent(existingJoy::setPassword);
@@ -78,5 +91,12 @@ public class NurseJoyService {
     public void deleteByNurseJoyId(String nurseJoyId){
         NurseJoy existingJoy = findByNurseJoyId(nurseJoyId);
         nurseJoyRepository.deleteByNurseJoyId(nurseJoyId);
+    }
+
+    private void checkEmailExists(String email, String nurseJoyId) {
+        Optional<NurseJoy> existingJoy = nurseJoyRepository.findByEmail(email);
+        if (existingJoy.isPresent() && !existingJoy.get().getNurseJoyId().equals(nurseJoyId)) {
+            throw new EmailAlreadyExistsException("Email already in use");
+        }
     }
 }
