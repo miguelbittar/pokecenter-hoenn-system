@@ -58,4 +58,10 @@ public class NurseJoyController {
         NurseJoy updateNurseJoy = nurseJoyService.updateOwnProfile(nurseJoyId, NurseJoyMapper.toEntityForUpdate(request));
         return ResponseEntity.ok(NurseJoyMapper.toResponse(updateNurseJoy));
     }
+
+    @DeleteMapping("/{nurseJoyId}")
+    public ResponseEntity<Void> deleteNurseJoy(@PathVariable String nurseJoyId){
+        nurseJoyService.deleteByNurseJoyId(nurseJoyId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface NurseJoyRepository extends JpaRepository<NurseJoy, String> {
     Optional<NurseJoy> findTopByOrderByCreatedAtDesc();
     Optional<NurseJoy> findByNurseJoyId(String nurseJoyId);
+    void deleteByNurseJoyId(String nurseJoyId);
 }

@@ -4,6 +4,7 @@ import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.repository.NurseJoyRepository;
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
 import com.hoenn.pokecenter.components.PasswordGenerator;
+import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
 
@@ -70,5 +71,12 @@ public class NurseJoyService {
         Optional.ofNullable(updateProfile.getRegion()).ifPresent(existingJoy::setRegion);
 
         return nurseJoyRepository.save(existingJoy);
+    }
+
+    @Transactional
+    public void deleteByNurseJoyId(String nurseJoyId){
+        NurseJoy existingJoy = nurseJoyRepository.findByNurseJoyId(nurseJoyId)
+                .orElseThrow(() -> new RuntimeException("No Nurse Joy found with ID: " + nurseJoyId));
+        nurseJoyRepository.deleteByNurseJoyId(nurseJoyId);
     }
 }
