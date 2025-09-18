@@ -6,6 +6,8 @@ import com.hoenn.pokecenter.components.BusinessIdGenerator;
 import com.hoenn.pokecenter.components.PasswordGenerator;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class NurseJoyService {
 
@@ -23,5 +25,9 @@ public class NurseJoyService {
         nurseJoy.setNurseJoyId(businessIdGenerator.generateSequentialNurseJoyId());
         nurseJoy.setPassword(passwordGenerator.generateTemporaryPassword());
         return nurseJoyRepository.save(nurseJoy);
+    }
+
+    public List<NurseJoy> getAllNurseJoys(){
+        return nurseJoyRepository.findAll();
     }
 }

@@ -8,10 +8,9 @@ import com.hoenn.pokecenter.service.NurseJoyService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pokecenter/staff/nurse-joys")
@@ -28,5 +27,13 @@ public class NurseJoyController {
         NurseJoy savedNurseJoy = nurseJoyService.registerNurseJoy(NurseJoyMapper.toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(NurseJoyMapper.toResponse(savedNurseJoy));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<NurseJoyResponse>> getAllNurseJoys(){
+        return ResponseEntity.ok(nurseJoyService.getAllNurseJoys()
+                .stream()
+                .map(NurseJoyMapper::toResponse)
+                .toList());
     }
 }
