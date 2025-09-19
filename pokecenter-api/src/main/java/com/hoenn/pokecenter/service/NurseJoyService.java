@@ -39,6 +39,9 @@ public class NurseJoyService {
         nurseJoy.setNurseJoyId(businessIdGenerator.generateSequentialNurseJoyId());
 
         String temporaryPassword = passwordGenerator.generateTemporaryPassword();
+
+        System.out.println("Password: " + temporaryPassword); //ONLY FOR TEST
+
         String encodedPassword = passwordEncoder.encode(temporaryPassword);
         nurseJoy.setPassword(encodedPassword);
 

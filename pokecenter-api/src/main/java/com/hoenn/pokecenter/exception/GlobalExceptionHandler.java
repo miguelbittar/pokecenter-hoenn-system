@@ -1,9 +1,6 @@
 package com.hoenn.pokecenter.exception;
 
-import com.hoenn.pokecenter.exception.custom.EmailAlreadyExistsException;
-import com.hoenn.pokecenter.exception.custom.NurseJoyNotFoundException;
-import com.hoenn.pokecenter.exception.custom.PasswordChangeNotAllowedException;
-import com.hoenn.pokecenter.exception.custom.UnauthorizedRoleChangeException;
+import com.hoenn.pokecenter.exception.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -46,6 +43,14 @@ public class GlobalExceptionHandler {
         response.put("error", "PASSWORD_CHANGE_NOT_ALLOWED");
         response.put("message", exception.getMessage());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCredentialsException(InvalidCredentialsException exception){
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "INVALID_CREDENTIALS");
+        response.put("message", exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
