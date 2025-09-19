@@ -9,6 +9,7 @@ import com.hoenn.pokecenter.repository.NurseJoyRepository;
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
 import com.hoenn.pokecenter.components.PasswordGenerator;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +19,13 @@ import java.util.Optional;
 public class NurseJoyService {
 
     private final NurseJoyRepository nurseJoyRepository;
+    private final PasswordEncoder passwordEncoder;
     private final BusinessIdGenerator businessIdGenerator;
     private final PasswordGenerator passwordGenerator;
 
-    public NurseJoyService(NurseJoyRepository nurseJoyRepository, BusinessIdGenerator businessIdGenerator, PasswordGenerator passwordGenerator) {
+    public NurseJoyService(NurseJoyRepository nurseJoyRepository, PasswordEncoder passwordEncoder, BusinessIdGenerator businessIdGenerator, PasswordGenerator passwordGenerator) {
         this.nurseJoyRepository = nurseJoyRepository;
+        this.passwordEncoder = passwordEncoder;
         this.businessIdGenerator = businessIdGenerator;
         this.passwordGenerator = passwordGenerator;
     }
@@ -34,7 +37,11 @@ public class NurseJoyService {
         }
 
         nurseJoy.setNurseJoyId(businessIdGenerator.generateSequentialNurseJoyId());
-        nurseJoy.setPassword(passwordGenerator.generateTemporaryPassword());
+
+        String temporaryPassword = passwordGenerator.generateTemporaryPassword();
+        String encodedPassword = passwordEncoder.encode(temporaryPassword);
+        nurseJoy.setPassword(encodedPassword);
+
         return nurseJoyRepository.save(nurseJoy);
     }
 
@@ -80,9 +87,11 @@ public class NurseJoyService {
 
         Optional.ofNullable(updateProfile.getName()).ifPresent(existingJoy::setName);
         Optional.ofNullable(updateProfile.getEmail()).ifPresent(existingJoy::setEmail);
-        Optional.ofNullable(updateProfile.getPassword()).ifPresent(existingJoy::setPassword);
         Optional.ofNullable(updateProfile.getCity()).ifPresent(existingJoy::setCity);
         Optional.ofNullable(updateProfile.getRegion()).ifPresent(existingJoy::setRegion);
+
+        Optional.ofNullable(updateProfile.getPassword())
+                .ifPresent(password -> existingJoy.setPassword(passwordEncoder.encode(password)));
 
         return nurseJoyRepository.save(existingJoy);
     }
