@@ -1,4 +1,4 @@
-package com.hoenn.pokecenter.service;
+package com.hoenn.pokecenter.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

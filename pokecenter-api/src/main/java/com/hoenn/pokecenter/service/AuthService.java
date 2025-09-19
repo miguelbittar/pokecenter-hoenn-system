@@ -5,6 +5,7 @@ import com.hoenn.pokecenter.dto.response.LoginResponse;
 import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.exception.custom.InvalidCredentialsException;
 import com.hoenn.pokecenter.repository.NurseJoyRepository;
+import com.hoenn.pokecenter.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
