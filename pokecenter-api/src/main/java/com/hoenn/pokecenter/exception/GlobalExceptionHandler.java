@@ -21,6 +21,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PokemonNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlePokemonNotFoundException(PokemonNotFoundException exception) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "POKEMON_NOT_FOUND");
+        response.put("message", exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleEmailAlreadyExistsException(EmailAlreadyExistsException exception) {
         Map<String, Object> response = new HashMap<>();
