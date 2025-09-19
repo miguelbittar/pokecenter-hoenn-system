@@ -53,6 +53,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(UnauthorizedOperationException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorizedOperationException(UnauthorizedOperationException exception){
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "UNAUTHORIZED_OPERATION");
+        response.put("message", exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException exception) {
         Map<String, Object> response = new HashMap<>();

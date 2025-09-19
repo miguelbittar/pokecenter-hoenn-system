@@ -1,14 +1,14 @@
 package com.hoenn.pokecenter.service;
 
+import com.hoenn.pokecenter.dto.request.AuthenticatedUser;
 import com.hoenn.pokecenter.entity.NurseJoy;
-import com.hoenn.pokecenter.exception.custom.EmailAlreadyExistsException;
-import com.hoenn.pokecenter.exception.custom.NurseJoyNotFoundException;
-import com.hoenn.pokecenter.exception.custom.PasswordChangeNotAllowedException;
-import com.hoenn.pokecenter.exception.custom.UnauthorizedRoleChangeException;
+import com.hoenn.pokecenter.exception.custom.*;
 import com.hoenn.pokecenter.repository.NurseJoyRepository;
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
 import com.hoenn.pokecenter.components.PasswordGenerator;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +78,12 @@ public class NurseJoyService {
     }
 
     public NurseJoy updateOwnProfile(String nurseJoyId, NurseJoy updateProfile){
+
+        AuthenticatedUser currentUser = getCurrentAuthenticatedUser();
+        if(!currentUser.nurseJoyId().equals(nurseJoyId)) {
+            throw new UnauthorizedOperationException("You can only update your own profile");
+        }
+
         NurseJoy existingJoy = findByNurseJoyId(nurseJoyId);
 
         if (updateProfile.getRole() != null){
@@ -111,5 +117,10 @@ public class NurseJoyService {
         if (existingJoy.isPresent() && !existingJoy.get().getNurseJoyId().equals(nurseJoyId)) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
+    }
+
+    private AuthenticatedUser getCurrentAuthenticatedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (AuthenticatedUser) authentication.getPrincipal();
     }
 }
