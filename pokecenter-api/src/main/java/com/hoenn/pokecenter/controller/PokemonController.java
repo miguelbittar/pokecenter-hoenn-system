@@ -1,6 +1,7 @@
 package com.hoenn.pokecenter.controller;
 
 import com.hoenn.pokecenter.dto.request.PokemonRequest;
+import com.hoenn.pokecenter.dto.request.PokemonUpdateRequest;
 import com.hoenn.pokecenter.dto.response.PokemonResponse;
 import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.entity.Pokemon;
@@ -35,23 +36,25 @@ public class PokemonController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Pokemon>> getAllPokemons(){
+    public ResponseEntity<List<PokemonResponse>> getAllPokemons(){
         return ResponseEntity.ok(pokemonService.getAllPokemons()
                 .stream()
+                .map(PokemonMapper::toResponse)
                 .toList());
     }
 
     @GetMapping("/{pokemonId}")
-    public ResponseEntity<Pokemon> getPokemonByPokemonId(@PathVariable String pokemonId) {
+    public ResponseEntity<PokemonResponse> getPokemonByPokemonId(@PathVariable String pokemonId) {
         Pokemon pokemon = pokemonService.findByPokemonId(pokemonId);
-        return ResponseEntity.ok(pokemon);
+        return ResponseEntity.ok(PokemonMapper.toResponse(pokemon));
     }
 
     @PutMapping("/{pokemonId}/profile")
-    public ResponseEntity<Pokemon> updatePokemonProfile(
-            @PathVariable String pokemonId, @Valid @RequestBody Pokemon request){
+    public ResponseEntity<PokemonResponse> updatePokemonProfile(@PathVariable String pokemonId,
+            @Valid @RequestBody PokemonUpdateRequest request) {
+
         Pokemon updatePokemon = pokemonService.updatePokemonProfile(pokemonId, request);
-        return ResponseEntity.ok(updatePokemon);
+        return ResponseEntity.ok(PokemonMapper.toResponse(updatePokemon));
     }
 
     @DeleteMapping("/{pokemonId}")

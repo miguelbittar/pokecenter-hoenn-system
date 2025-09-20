@@ -1,6 +1,9 @@
 package com.hoenn.pokecenter.service;
 
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
+import com.hoenn.pokecenter.dto.request.PokemonUpdateRequest;
+import com.hoenn.pokecenter.dto.response.PokemonResponse;
+import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.entity.Pokemon;
 import com.hoenn.pokecenter.enums.PokemonStatus;
 import com.hoenn.pokecenter.exception.custom.PokemonNotFoundException;
@@ -16,10 +19,12 @@ public class PokemonService {
 
     private final PokemonRepository pokemonRepository;
     private final BusinessIdGenerator businessIdGenerator;
+    private final NurseJoyService nurseJoyService;
 
-    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator) {
+    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator, NurseJoyService nurseJoyService) {
         this.pokemonRepository = pokemonRepository;
         this.businessIdGenerator = businessIdGenerator;
+        this.nurseJoyService = nurseJoyService;
     }
 
     public Pokemon registerPokemon(Pokemon pokemon){
@@ -41,15 +46,20 @@ public class PokemonService {
                 .orElseThrow(() -> new PokemonNotFoundException("No Pokémon found with ID: " + pokemonId));
     }
 
-    public Pokemon updatePokemonProfile (String pokemonId, Pokemon updateProfile){
+    public Pokemon updatePokemonProfile(String pokemonId, PokemonUpdateRequest request) {
         Pokemon existingPokemon = findByPokemonId(pokemonId);
 
-        Optional.ofNullable(updateProfile.getName()).ifPresent(existingPokemon::setName);
-        Optional.ofNullable(updateProfile.getSpecies()).ifPresent(existingPokemon::setSpecies);
-        Optional.ofNullable(updateProfile.getTrainerId()).ifPresent(existingPokemon::setTrainerId);
-        Optional.ofNullable(updateProfile.getCondition()).ifPresent(existingPokemon::setCondition);
-        Optional.ofNullable(updateProfile.getStatus()).ifPresent(existingPokemon::setStatus);
-        Optional.ofNullable(updateProfile.getResponsibleJoy()).ifPresent(existingPokemon::setResponsibleJoy);
+        if (request.responsibleJoyId() != null) {
+            NurseJoy newJoy = nurseJoyService.findByNurseJoyId(request.responsibleJoyId());
+            existingPokemon.setResponsibleJoy(newJoy);
+        }
+
+        Optional.ofNullable(request.name()).ifPresent(existingPokemon::setName);
+        Optional.ofNullable(request.species()).ifPresent(existingPokemon::setSpecies);
+        Optional.ofNullable(request.trainerId()).ifPresent(existingPokemon::setTrainerId);
+        Optional.ofNullable(request.condition()).ifPresent(existingPokemon::setCondition);
+        Optional.ofNullable(request.status()).ifPresent(existingPokemon::setStatus);
+        Optional.ofNullable(request.releaseDate()).ifPresent(existingPokemon::setReleaseDate);
 
         return pokemonRepository.save(existingPokemon);
     }
