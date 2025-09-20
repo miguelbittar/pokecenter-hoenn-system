@@ -1,6 +1,11 @@
 package com.hoenn.pokecenter.controller;
 
+import com.hoenn.pokecenter.dto.request.PokemonRequest;
+import com.hoenn.pokecenter.dto.response.PokemonResponse;
+import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.entity.Pokemon;
+import com.hoenn.pokecenter.mapper.PokemonMapper;
+import com.hoenn.pokecenter.service.NurseJoyService;
 import com.hoenn.pokecenter.service.PokemonService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -14,17 +19,19 @@ import java.util.List;
 public class PokemonController {
 
     private final PokemonService pokemonService;
+    private final NurseJoyService nurseJoyService;
 
-    public PokemonController(PokemonService pokemonService) {
+    public PokemonController(PokemonService pokemonService, NurseJoyService nurseJoyService) {
         this.pokemonService = pokemonService;
+        this.nurseJoyService = nurseJoyService;
     }
 
     @PostMapping
-    public ResponseEntity<Pokemon> registerPokemon(@Valid @RequestBody Pokemon pokemon,
-            @RequestParam String responsibleJoyId) {
-
-        Pokemon savedPokemon = pokemonService.registerPokemon(pokemon, responsibleJoyId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPokemon);
+    public ResponseEntity<PokemonResponse> registerPokemon(@Valid @RequestBody PokemonRequest request) {
+        NurseJoy nurseJoy= nurseJoyService.findByNurseJoyId(request.responsibleJoyId());
+        Pokemon savedPokemon = pokemonService.registerPokemon(PokemonMapper.toEntity(request, nurseJoy));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(PokemonMapper.toResponse(savedPokemon));
     }
 
     @GetMapping

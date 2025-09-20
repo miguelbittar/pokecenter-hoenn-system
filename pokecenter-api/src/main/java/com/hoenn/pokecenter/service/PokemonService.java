@@ -1,7 +1,6 @@
 package com.hoenn.pokecenter.service;
 
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
-import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.entity.Pokemon;
 import com.hoenn.pokecenter.enums.PokemonStatus;
 import com.hoenn.pokecenter.exception.custom.PokemonNotFoundException;
@@ -17,22 +16,17 @@ public class PokemonService {
 
     private final PokemonRepository pokemonRepository;
     private final BusinessIdGenerator businessIdGenerator;
-    private final NurseJoyService nurseJoyService;
 
-    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator, NurseJoyService nurseJoyService) {
+    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator) {
         this.pokemonRepository = pokemonRepository;
         this.businessIdGenerator = businessIdGenerator;
-        this.nurseJoyService = nurseJoyService;
     }
 
-    public Pokemon registerPokemon(Pokemon pokemon, String responsibleJoyId){
+    public Pokemon registerPokemon(Pokemon pokemon){
         /*
         TODO: Validate trainerId in Pokémon League + RVP
         TODO: Validate species in PokéAPI
         */
-        NurseJoy joy = nurseJoyService.findByNurseJoyId(responsibleJoyId);
-        pokemon.setResponsibleJoy(joy);
-
         pokemon.setPokemonId(businessIdGenerator.generateSequentialPokemonId());
         pokemon.setStatus(PokemonStatus.ADMISSION);
         return pokemonRepository.save(pokemon);

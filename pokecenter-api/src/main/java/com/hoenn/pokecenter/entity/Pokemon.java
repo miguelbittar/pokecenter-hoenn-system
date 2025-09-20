@@ -78,6 +78,14 @@ public class Pokemon {
         this.responsibleJoy = responsibleJoy;
     }
 
+    public Pokemon(String name, String species, String trainerId, PokemonCondition condition, NurseJoy responsibleJoy) {
+        this.name = name;
+        this.species = species;
+        this.trainerId = trainerId;
+        this.condition = condition;
+        this.responsibleJoy = responsibleJoy;
+    }
+
     public void softDelete(){
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
