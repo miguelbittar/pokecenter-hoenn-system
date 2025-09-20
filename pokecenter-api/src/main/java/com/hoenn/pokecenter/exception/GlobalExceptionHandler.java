@@ -69,6 +69,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(InvalidPokemonSpeciesException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPokemonSpeciesException(InvalidPokemonSpeciesException exception) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "INVALID_POKEMON_SPECIES");
+        response.put("message", exception.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException exception) {
         Map<String, Object> response = new HashMap<>();

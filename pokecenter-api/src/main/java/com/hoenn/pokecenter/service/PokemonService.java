@@ -6,7 +6,9 @@ import com.hoenn.pokecenter.dto.response.PokemonResponse;
 import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.entity.Pokemon;
 import com.hoenn.pokecenter.enums.PokemonStatus;
+import com.hoenn.pokecenter.exception.custom.InvalidPokemonSpeciesException;
 import com.hoenn.pokecenter.exception.custom.PokemonNotFoundException;
+import com.hoenn.pokecenter.external.PokeApiClient;
 import com.hoenn.pokecenter.repository.PokemonRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -20,18 +22,21 @@ public class PokemonService {
     private final PokemonRepository pokemonRepository;
     private final BusinessIdGenerator businessIdGenerator;
     private final NurseJoyService nurseJoyService;
+    private final PokeApiClient pokeApiClient;
 
-    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator, NurseJoyService nurseJoyService) {
+    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator, NurseJoyService nurseJoyService, PokeApiClient pokeApiClient) {
         this.pokemonRepository = pokemonRepository;
         this.businessIdGenerator = businessIdGenerator;
         this.nurseJoyService = nurseJoyService;
+        this.pokeApiClient = pokeApiClient;
     }
 
     public Pokemon registerPokemon(Pokemon pokemon){
-        /*
-        TODO: Validate trainerId in Pokémon League + RVP
-        TODO: Validate species in PokéAPI
-        */
+
+        if(!pokeApiClient.validateSpecies(pokemon.getSpecies())){
+            throw new InvalidPokemonSpeciesException(pokemon.getSpecies());
+        }
+
         pokemon.setPokemonId(businessIdGenerator.generateSequentialPokemonId());
         pokemon.setStatus(PokemonStatus.ADMISSION);
         return pokemonRepository.save(pokemon);
@@ -46,20 +51,28 @@ public class PokemonService {
                 .orElseThrow(() -> new PokemonNotFoundException("No Pokémon found with ID: " + pokemonId));
     }
 
-    public Pokemon updatePokemonProfile(String pokemonId, PokemonUpdateRequest request) {
+    public Pokemon updatePokemonProfile(String pokemonId, PokemonUpdateRequest updateRequest) {
         Pokemon existingPokemon = findByPokemonId(pokemonId);
 
-        if (request.responsibleJoyId() != null) {
-            NurseJoy newJoy = nurseJoyService.findByNurseJoyId(request.responsibleJoyId());
+        if (updateRequest.species() != null &&
+                !updateRequest.species().equals(existingPokemon.getSpecies())){
+
+            if (!pokeApiClient.validateSpecies(updateRequest.species())) {
+                throw new InvalidPokemonSpeciesException(updateRequest.species());
+            }
+        }
+
+        if (updateRequest.responsibleJoyId() != null) {
+            NurseJoy newJoy = nurseJoyService.findByNurseJoyId(updateRequest.responsibleJoyId());
             existingPokemon.setResponsibleJoy(newJoy);
         }
 
-        Optional.ofNullable(request.name()).ifPresent(existingPokemon::setName);
-        Optional.ofNullable(request.species()).ifPresent(existingPokemon::setSpecies);
-        Optional.ofNullable(request.trainerId()).ifPresent(existingPokemon::setTrainerId);
-        Optional.ofNullable(request.condition()).ifPresent(existingPokemon::setCondition);
-        Optional.ofNullable(request.status()).ifPresent(existingPokemon::setStatus);
-        Optional.ofNullable(request.releaseDate()).ifPresent(existingPokemon::setReleaseDate);
+        Optional.ofNullable(updateRequest.name()).ifPresent(existingPokemon::setName);
+        Optional.ofNullable(updateRequest.species()).ifPresent(existingPokemon::setSpecies);
+        Optional.ofNullable(updateRequest.trainerId()).ifPresent(existingPokemon::setTrainerId);
+        Optional.ofNullable(updateRequest.condition()).ifPresent(existingPokemon::setCondition);
+        Optional.ofNullable(updateRequest.status()).ifPresent(existingPokemon::setStatus);
+        Optional.ofNullable(updateRequest.releaseDate()).ifPresent(existingPokemon::setReleaseDate);
 
         return pokemonRepository.save(existingPokemon);
     }
