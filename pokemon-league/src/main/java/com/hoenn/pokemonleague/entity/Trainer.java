@@ -18,7 +18,7 @@ public class Trainer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(unique = true)
+    @Column(name = "trainer_id", unique = true)
     private String trainerId;
 
     @NotBlank(message = "Name is required")
