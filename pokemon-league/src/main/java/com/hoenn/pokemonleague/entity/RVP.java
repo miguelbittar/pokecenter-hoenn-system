@@ -18,6 +18,9 @@ public class RVP {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "rvp_id", unique = true, nullable = false, length = 12)
+    private String rvpId;
+
     @NotNull(message = "Trainer is required")
     @ManyToOne
     @JoinColumn(name = "trainer_id", referencedColumnName = "trainer_id")
@@ -175,5 +178,13 @@ public class RVP {
 
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public String getRvpId() {
+        return rvpId;
+    }
+
+    public void setRvpId(String rvpId) {
+        this.rvpId = rvpId;
     }
 }
