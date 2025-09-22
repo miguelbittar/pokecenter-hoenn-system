@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: pokemon-league
+
+  datasource:
+    url: jdbc:postgresql://${LEAGUE_DB_HOST}:${LEAGUE_DB_PORT}/${LEAGUE_DB_NAME}
+    username: ${LEAGUE_DB_USERNAME}
+    password: ${LEAGUE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/league
+
+logging:
+  level:
+    com.hoenn.pokemonleague: DEBUG
+    org.hibernate.SQL: DEBUG

@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Pokécenter Database
   postgres:
     image: postgres:latest
     container_name: pokecenter-hoenn-postgres
@@ -14,5 +15,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  # Pokémon League Database
+  pokemon-league-postgres:
+    image: postgres:latest
+    container_name: pokemon-league-postgres
+    environment:
+      POSTGRES_DB: ${LEAGUE_DB_NAME}
+      POSTGRES_USER: ${LEAGUE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${LEAGUE_DB_PASSWORD}
+    ports:
+      - "${LEAGUE_DB_PORT}:5432"
+    volumes:
+      - pokemon_league_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  pokemon_league_data:
