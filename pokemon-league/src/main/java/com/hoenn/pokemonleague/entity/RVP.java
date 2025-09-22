@@ -3,7 +3,6 @@ package com.hoenn.pokemonleague.entity;
 import com.hoenn.pokemonleague.enums.RVPStatus;
 import com.hoenn.pokemonleague.enums.TrainerRegion;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -19,15 +18,19 @@ public class RVP {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @NotBlank(message = "Trainer ID is required")
-    private String trainerId;
+    @NotNull(message = "Trainer is required")
+    @ManyToOne
+    @JoinColumn(name = "trainer_id", referencedColumnName = "trainer_id")
+    private Trainer trainer;
 
     @NotNull(message = "Target region is required")
     @Enumerated(EnumType.STRING)
     private TrainerRegion targetRegion;
 
-    @NotBlank(message = "Issuing city is required")
-    private String issuingCityId;
+    @NotNull(message = "Issuing city is required")
+    @ManyToOne
+    @JoinColumn(name = "issuing_city_id")
+    private ValidCity issuingCity;
 
     @NotNull(message = "RVP status is required")
     @Enumerated(EnumType.STRING)
@@ -57,10 +60,10 @@ public class RVP {
 
     public RVP() {}
 
-    public RVP(String trainerId, TrainerRegion targetRegion, String issuingCityId) {
-        this.trainerId = trainerId;
+    public RVP(Trainer trainer, TrainerRegion targetRegion, ValidCity issuingCity) {
+        this.trainer = trainer;
         this.targetRegion = targetRegion;
-        this.issuingCityId = issuingCityId;
+        this.issuingCity = issuingCity;
         this.status = RVPStatus.ACTIVE;
         this.issueDate = LocalDate.now();
         this.expiryDate = LocalDate.now().plusDays(90);
@@ -86,12 +89,12 @@ public class RVP {
         this.id = id;
     }
 
-    public String getTrainerId() {
-        return trainerId;
+    public Trainer getTrainer() {
+        return trainer;
     }
 
-    public void setTrainerId(String trainerId) {
-        this.trainerId = trainerId;
+    public void setTrainer(Trainer trainer) {
+        this.trainer = trainer;
     }
 
     public TrainerRegion getTargetRegion() {
@@ -102,12 +105,12 @@ public class RVP {
         this.targetRegion = targetRegion;
     }
 
-    public String getIssuingCityId() {
-        return issuingCityId;
+    public ValidCity getIssuingCity() {
+        return issuingCity;
     }
 
-    public void setIssuingCityId(String issuingCityId) {
-        this.issuingCityId = issuingCityId;
+    public void setIssuingCity(ValidCity issuingCity) {
+        this.issuingCity = issuingCity;
     }
 
     public RVPStatus getStatus() {
