@@ -3,6 +3,7 @@ package com.hoenn.pokemonleague.exceptions;
 import com.hoenn.pokemonleague.exceptions.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -50,5 +51,19 @@ public class GlobalExceptionHandler {
         response.put("error", "RVP_NOT_FOUND");
         response.put("message", exception.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException exception) {
+        Map<String, Object> response = new HashMap<>();
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        exception.getBindingResult()
+                .getFieldErrors()
+                .forEach(fieldError -> fieldErrors.put(fieldError.getField(), fieldError.getDefaultMessage())
+                );
+        response.put("error", "VALIDATION_FAILED");
+        response.put("fieldErrors", fieldErrors);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
