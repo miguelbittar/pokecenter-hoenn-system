@@ -49,7 +49,8 @@ public class RVPService {
             throw new DuplicateRVPException("Trainer already has active RVP for region: " + targetRegion);
         }
 
-        ValidCity issuingCity = validCityRepository.findByCityNameAndIsDeletedFalse(issuingCityName)
+        String normalizedCityName = normalizeCityName(issuingCityName);
+        ValidCity issuingCity = validCityRepository.findByCityNameAndIsDeletedFalse(normalizedCityName)
                 .orElseThrow(() -> new ValidCityNotFoundException("City not credentialed: " + issuingCityName));
 
         String rvpId = businessIdGenerator.generateRandomRVPId(targetRegion);
@@ -91,5 +92,12 @@ public class RVPService {
         }
 
         return RVPMapper.toStatusResponse(rvp);
+    }
+
+    private String normalizeCityName(String cityName) {
+        return cityName.trim()
+                .toLowerCase()
+                .replaceAll("\\s+", "-")
+                .replaceAll("_", "-");
     }
 }

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hoenn</groupId>
-	<artifactId>pokemon-league</artifactId>
+	<artifactId>pokemon-league-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pokemon-league</name>
 	<description>Demo project for Spring Boot</description>
