@@ -8,10 +8,9 @@ import com.hoenn.pokemonleague.service.TrainerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pokemon-league/trainers")
@@ -28,5 +27,20 @@ public class TrainerController {
         Trainer savedTrainer = trainerService.registerTrainer(TrainerMapper.toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(TrainerMapper.toResponse(savedTrainer));
+    }
+
+    @GetMapping("/{trainerId}")
+    public ResponseEntity<TrainerResponse> getTrainerById(@PathVariable String trainerId) {
+        Trainer trainer = trainerService.findByTrainerId(trainerId);
+        return ResponseEntity.ok(TrainerMapper.toResponse(trainer));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TrainerResponse>> getAllTrainers() {
+        List<Trainer> trainers = trainerService.getAllTrainers();
+        List<TrainerResponse> responses = trainers.stream()
+                .map(TrainerMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 }
