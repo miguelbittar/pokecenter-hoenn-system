@@ -5,6 +5,7 @@ import com.hoenn.pokemonleague.dto.response.RVPStatusResponse;
 import com.hoenn.pokemonleague.entity.RVP;
 import com.hoenn.pokemonleague.entity.Trainer;
 import com.hoenn.pokemonleague.entity.ValidCity;
+import com.hoenn.pokemonleague.enums.AuthorityType;
 import com.hoenn.pokemonleague.enums.RVPStatus;
 import com.hoenn.pokemonleague.enums.TrainerRegion;
 import com.hoenn.pokemonleague.exceptions.custom.DuplicateRVPException;
@@ -36,22 +37,30 @@ public class RVPService {
         this.businessIdGenerator = businessIdGenerator;
     }
 
-    public RVP issueRVP(String trainerId, TrainerRegion targetRegion, String issuingCityName){
+    public RVP issueRVP(String trainerId, TrainerRegion targetRegion, String issuingCityName, AuthorityType authorityType) {
         Trainer trainer = trainerRepository.findByTrainerIdAndIsDeletedFalse(trainerId)
                 .orElseThrow(() -> new TrainerNotFoundException("Trainer not found: " + trainerId));
 
-        if (trainer.getRegion() == targetRegion){
+        if (trainer.getRegion() == targetRegion) {
             throw new InvalidRVPRequestException("Cannot issue RVP for trainer's own region");
         }
 
         Optional<RVP> existingRVP = rvpRepository.findActiveRVPByTrainerAndTargetRegion(trainerId, targetRegion);
-        if (existingRVP.isPresent()){
+        if (existingRVP.isPresent()) {
             throw new DuplicateRVPException("Trainer already has active RVP for region: " + targetRegion);
         }
 
         String normalizedCityName = normalizeCityName(issuingCityName);
-        ValidCity issuingCity = validCityRepository.findByCityNameAndIsDeletedFalse(normalizedCityName)
-                .orElseThrow(() -> new ValidCityNotFoundException("City not credentialed: " + issuingCityName));
+
+        ValidCity issuingCity = validCityRepository.findByCityNameAndRegionAndAuthorityTypeAndIsDeletedFalse(
+                normalizedCityName,
+                targetRegion,
+                authorityType
+        ).orElseThrow(() -> new ValidCityNotFoundException(
+                "City not credentialed: " + issuingCityName +
+                        " in region " + targetRegion +
+                        " with authority " + authorityType
+        ));
 
         String rvpId = businessIdGenerator.generateRandomRVPId(targetRegion);
         RVP rvp = new RVP(trainer, targetRegion, issuingCity);

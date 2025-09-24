@@ -24,10 +24,17 @@ public class RVPController {
 
     @PostMapping
     public ResponseEntity<RVPResponse> issueRVP(@Valid @RequestBody RVPRequest request) {
-        RVP savedRVP = rvpService.issueRVP(request.trainerId(), request.targetRegion(), request.cityName());
+        RVP savedRVP = rvpService.issueRVP(
+                request.trainerId(),
+                request.targetRegion(),
+                request.cityName(),
+                request.authorityType()
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(RVPMapper.toResponse(savedRVP));
     }
+
 
     @GetMapping("/{trainerId}/status")
     public ResponseEntity<RVPStatusResponse> validateRVPStatus(@PathVariable String trainerId,

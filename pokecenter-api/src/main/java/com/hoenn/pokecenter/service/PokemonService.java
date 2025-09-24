@@ -2,15 +2,21 @@ package com.hoenn.pokecenter.service;
 
 import com.hoenn.pokecenter.components.BusinessIdGenerator;
 import com.hoenn.pokecenter.dto.request.PokemonUpdateRequest;
-import com.hoenn.pokecenter.dto.response.PokemonResponse;
+import com.hoenn.pokecenter.dto.response.RVPValidationResponse;
 import com.hoenn.pokecenter.entity.NurseJoy;
 import com.hoenn.pokecenter.entity.Pokemon;
 import com.hoenn.pokecenter.enums.PokemonStatus;
 import com.hoenn.pokecenter.exception.custom.InvalidPokemonSpeciesException;
+import com.hoenn.pokecenter.exception.custom.InvalidRVPException;
 import com.hoenn.pokecenter.exception.custom.PokemonNotFoundException;
+import com.hoenn.pokecenter.exception.custom.TrainerNotRegisteredException;
 import com.hoenn.pokecenter.external.PokeApiClient;
+import com.hoenn.pokecenter.external.PokemonLeagueClient;
 import com.hoenn.pokecenter.repository.PokemonRepository;
+import com.hoenn.pokecenter.utils.TrainerIdUtils;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,19 +25,24 @@ import java.util.Optional;
 @Service
 public class PokemonService {
 
+    private static final Logger log = LoggerFactory.getLogger(PokemonService.class);
     private final PokemonRepository pokemonRepository;
     private final BusinessIdGenerator businessIdGenerator;
     private final NurseJoyService nurseJoyService;
     private final PokeApiClient pokeApiClient;
+    private final PokemonLeagueClient pokemonLeagueClient;
 
-    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator, NurseJoyService nurseJoyService, PokeApiClient pokeApiClient) {
+    public PokemonService(PokemonRepository pokemonRepository, BusinessIdGenerator businessIdGenerator, NurseJoyService nurseJoyService, PokeApiClient pokeApiClient, PokemonLeagueClient pokemonLeagueClient) {
         this.pokemonRepository = pokemonRepository;
         this.businessIdGenerator = businessIdGenerator;
         this.nurseJoyService = nurseJoyService;
         this.pokeApiClient = pokeApiClient;
+        this.pokemonLeagueClient = pokemonLeagueClient;
     }
 
     public Pokemon registerPokemon(Pokemon pokemon){
+
+        validateTrainerId(pokemon.getTrainerId());
 
         if(!pokeApiClient.validateSpecies(pokemon.getSpecies())){
             throw new InvalidPokemonSpeciesException(pokemon.getSpecies());
@@ -82,5 +93,37 @@ public class PokemonService {
         Pokemon existingPokemon = findByPokemonId(pokemonId);
         existingPokemon.softDelete();
         pokemonRepository.save(existingPokemon);
+    }
+
+    private void validateTrainerId(String trainerId) {
+        String trainerRegion = TrainerIdUtils.extractRegion(trainerId);
+
+        if (!pokemonLeagueClient.validateTrainerId(trainerId)) {
+            throw new TrainerNotRegisteredException(
+                    "Trainer ID '" + trainerId + "' is not registered in Pokemon League system"
+            );
+        }
+
+        if (TrainerIdUtils.isFromHoenn(trainerId)) {
+            log.debug("Trainer {} from Hoenn region validated successfully", trainerId);
+            return;
+        }
+
+        log.debug("Trainer {} is from {} region, validating RVP for Hoenn access", trainerId, trainerRegion);
+        validateForeignTrainerRVP(trainerId, trainerRegion);
+    }
+
+    private void validateForeignTrainerRVP(String trainerId, String trainerRegion) {
+        RVPValidationResponse rvpResponse = pokemonLeagueClient.validateTrainerRVP(trainerId, "HOENN");
+
+        if (!rvpResponse.hasValidRVP()) {
+            throw new InvalidRVPException(
+                    "Trainer from " + trainerRegion + " region requires a valid RVP to access Hoenn services. " +
+                            "Please obtain a Region Visitor Passport from Pokemon League. " + rvpResponse.message()
+            );
+        }
+
+        log.debug("Foreign trainer {} validated successfully with RVP status: {}",
+                trainerId, rvpResponse.status());
     }
 }

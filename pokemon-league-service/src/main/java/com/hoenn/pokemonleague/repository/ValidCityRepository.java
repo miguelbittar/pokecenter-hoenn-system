@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ValidCityRepository extends JpaRepository<ValidCity, String> {
-    Optional<ValidCity> findByCityNameAndIsDeletedFalse(String cityName);
+
+    Optional<ValidCity> findByCityNameAndRegionAndAuthorityTypeAndIsDeletedFalse(
+            String cityName,
+            TrainerRegion region,
+            AuthorityType authorityType
+    );
 
     List<ValidCity> findByIsDeletedFalse();
 

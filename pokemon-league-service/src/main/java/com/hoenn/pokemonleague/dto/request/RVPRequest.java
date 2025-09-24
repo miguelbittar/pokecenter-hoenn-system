@@ -1,5 +1,6 @@
 package com.hoenn.pokemonleague.dto.request;
 
+import com.hoenn.pokemonleague.enums.AuthorityType;
 import com.hoenn.pokemonleague.enums.TrainerRegion;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,5 +13,8 @@ public record RVPRequest(
         TrainerRegion targetRegion,
 
         @NotBlank(message = "City name is required")
-        String cityName
+        String cityName,
+
+        @NotNull(message = "Authority type is required")
+        AuthorityType authorityType
 ) {}

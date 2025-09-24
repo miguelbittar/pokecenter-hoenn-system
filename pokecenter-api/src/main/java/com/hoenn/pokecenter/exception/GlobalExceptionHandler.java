@@ -77,6 +77,38 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidTrainerIdFormatException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidTrainerIdFormatException(
+            InvalidTrainerIdFormatException ex) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "Invalid Trainer ID Format");
+        response.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(TrainerNotRegisteredException.class)
+    public ResponseEntity<Map<String, Object>> handleTrainerNotRegisteredException(
+            TrainerNotRegisteredException ex) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "Trainer Not Registered");
+        response.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(InvalidRVPException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidRVPException(
+            InvalidRVPException ex) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "Invalid Region Visitor Passport");
+        response.put("message", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException exception) {
         Map<String, Object> response = new HashMap<>();
