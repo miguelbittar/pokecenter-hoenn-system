@@ -26,6 +26,13 @@ pokecenter-hoenn:
     jwt:
       secret-key: ${JWT_SECRET}
 
+  integrations:
+    pokemon-league:
+      base-url: ${POKEMON_LEAGUE_BASE_URL:http://localhost:8081}
+      timeout:
+        connect: 5000
+        read: 10000
+
 logging:
   level:
     com.hoenn.pokecenter: DEBUG
