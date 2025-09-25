@@ -66,7 +66,7 @@ class RVPServiceTest {
         when(rvpRepository.findActiveRVPByTrainerAndTargetRegion(trainerId, targetRegion)).thenReturn(Optional.empty());
         when(validCityRepository.findByCityNameAndRegionAndAuthorityTypeAndIsDeletedFalse(cityName, targetRegion, authorityType)).thenReturn(Optional.of(mockCity));
         when(businessIdGenerator.generateRandomRVPId(targetRegion)).thenReturn("RVP123456-HN");
-        when(rvpRepository.save(any(RVP.class))).thenReturn(expectedRvp);
+        when(rvpRepository.save(any(RVP.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         RVP result = rvpService.issueRVP(trainerId, targetRegion, cityName, authorityType);
 
@@ -171,7 +171,7 @@ class RVPServiceTest {
         mockRvp.setStatus(RVPStatus.ACTIVE);
 
         when(rvpRepository.findActiveRVPByTrainerAndTargetRegion(trainerId, targetRegion)).thenReturn(Optional.of(mockRvp));
-        when(rvpRepository.save(mockRvp)).thenReturn(mockRvp);
+        when(rvpRepository.save(mockRvp)).thenAnswer(invocation -> invocation.getArgument(0));
 
         RVPStatusResponse response = rvpService.validateRVPStatus(trainerId, targetRegion);
 

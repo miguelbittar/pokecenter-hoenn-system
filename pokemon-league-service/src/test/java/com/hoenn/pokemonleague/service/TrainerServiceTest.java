@@ -40,7 +40,7 @@ class TrainerServiceTest {
         Trainer mockTrainer = new Trainer("Test", "test@email.com", TrainerRegion.HOENN);
 
         when(businessIdGenerator.generateRandomTrainerId(TrainerRegion.HOENN)).thenReturn("HN123456");
-        when(trainerRepository.save(any(Trainer.class))).thenReturn(mockTrainer);
+        when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Trainer result = trainerService.registerTrainer(mockTrainer);
 
